@@ -167,8 +167,18 @@ int main( int argc, const char *argv[] )
 
     // Initialize Root
     root->getRenderSystem()->setConfigOption( "sRGB Gamma Conversion", "Yes" );
-    Window *window = root->initialise( true, "Tutorial 00: Basic" );
+    // Window *window = root->initialise( true, "Tutorial 00: Basic" );
+    root->initialise( false, "Tutorial 00: Basic" );
 
+    Ogre::NameValuePairList params;
+    params.insert ( std::make_pair ( "title", "Tutorial 00: Basic" ) );
+    params.insert ( std::make_pair ( "vsync_method", "Render Ahead / FIFO" ) );
+    params.insert ( std::make_pair ( "FSAA", "1" ) );
+    params.insert ( std::make_pair ( "vsync", "Yes" ) );
+    params.insert ( std::make_pair ( "reverse_depth", "Yes" ) );
+    Window *window = Ogre::Root::getSingleton ().createRenderWindow ( "Tutorial 00: Basic", 1280, 720, false, &params );
+
+    Ogre::ResourceGroupManager::getSingleton ().addResourceLocation ( "../data", "FileSystem", "General" );
     registerHlms();
 
     // Create SceneManager
@@ -177,7 +187,6 @@ int main( int argc, const char *argv[] )
 
     // Create & setup camera
     Camera *camera = sceneManager->createCamera( "Main Camera" );
-
     // Position it at 500 in Z direction
     camera->setPosition( Vector3( 0, 5, 15 ) );
     // Look back along -Z
@@ -195,6 +204,12 @@ int main( int argc, const char *argv[] )
 
     MyWindowEventListener myWindowEventListener;
     WindowEventUtilities::addWindowEventListener( window, &myWindowEventListener );
+
+    camera->setPosition ( Ogre::Vector3 ( 0, 30, 100 ) );
+    sceneManager->setForwardClustered ( true, 16, 8, 24, 96, 0, 0, 5, 500 );
+
+    Ogre::HlmsManager *hlmsManager = root->getHlmsManager ();
+    Ogre::Hlms *hlms = hlmsManager->getHlms ( Ogre::HLMS_PBS );
 
     // ---------------------------------------------------------------------------
 
@@ -226,13 +241,12 @@ int main( int argc, const char *argv[] )
 
     // ---------------------------------------------------------------------------
 
-    Ogre::HlmsManager *hlmsManager = root->getHlmsManager ();
-    Ogre::Hlms *hlms = hlmsManager->getHlms ( Ogre::HLMS_PBS );
-
-    Ogre::Item *cubeItem = sceneManager->createItem ( "../data/cube.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, Ogre::SCENE_DYNAMIC );
+    // Ogre::Item *cubeItem = sceneManager->createItem ( "../data/cube.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, Ogre::SCENE_DYNAMIC );
+    Ogre::Item *cubeItem = sceneManager->createItem ( "cube.mesh", "General", Ogre::SCENE_DYNAMIC );
     cubeItem->setDatablock ( hlms->getDatablock ( "BaseWhite" ) );
     Ogre::SceneNode *cubeNode = sceneManager->getRootSceneNode ( Ogre::SCENE_DYNAMIC )->createChildSceneNode ( Ogre::SCENE_DYNAMIC );
-    cubeNode->setPosition ( 0, 0, -100 );
+    cubeNode->setPosition ( 0, 0, 0 );
+    cubeNode->scale( 0.5f, 0.5f, 0.5f );
     cubeNode->attachObject ( cubeItem );
 
     bool bQuit = false;
@@ -252,4 +266,3 @@ int main( int argc, const char *argv[] )
 
     return 0;
 }
-

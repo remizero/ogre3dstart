@@ -1,5 +1,6 @@
 TARGET = ogre3dstart
 TEMPLATE = app
+DEFINES += NDEBUG
 
 SOURCES += \
   main.cpp
